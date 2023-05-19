@@ -73,6 +73,14 @@ async def openapi_spec():
             "paths": dict(list(github_spec["paths"].items())[:200]),
             "components": {"schemas": dict(list(github_spec["components"]["schemas"].items())[:200])},
         }
+        # Change all the operationIds to be unique and smaller than length 300
+        operationid = 0
+        for path in spec["paths"].values():
+            for operation in path.values():
+                operation["operationId"] = f"operation_{operationid}"
+                operationid += 1
+                operation['description'] = operation['description'][:300]
+
         text = yaml.dump(spec)
         # Switch all lines that end in - null to - "null"
         # {"detail":"Error setting localhost plugin: {\"validation_errors\":[{\"loc\":[\"enum\",9],\"msg\":\"none is not an allowed value\",\"type\":\"type_error.none.not_allowed\"}],\"message\":\"1 validation error for StringSchema\\nenum -> 9\\n  none is not an allowed value (type=type_error.none.not_allowed)\"}"}
