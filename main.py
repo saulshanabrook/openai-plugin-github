@@ -28,7 +28,7 @@ async def proxy_request(path=""):
         response=response.content,
         status=response.status_code,
         # headers=dict(response.headers),
-        mimetype=response.headers["content-type"],
+        mimetype=response.headers.get("content-type", None),
     )
 
 
