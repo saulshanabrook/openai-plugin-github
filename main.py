@@ -9,21 +9,26 @@ from quart import request
 app = quart_cors.cors(quart.Quart(__name__), allow_origin="https://chat.openai.com")
 
 
-@app.route("/<path:path>", methods=["GET", "POST", "PUT", "DELETE"])
-async def proxy_request(path):
+@app.route("/", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+@app.route("/<path:path>", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+async def proxy_request(path=""):
     url = f"https://api.github.com/{path}"
+
+    data = await request.get_data()
+    # log all request options
+
     response = requests.request(
         method=request.method,
         url=url,
-        headers=dict(request.headers),
-        data=await request.get_data(),
+        data=data,
         cookies=request.cookies,
         allow_redirects=False,
     )
     return quart.Response(
         response=response.content,
         status=response.status_code,
-        headers=dict(response.headers),
+        # headers=dict(response.headers),
+        mimetype=response.headers["content-type"],
     )
 
 
